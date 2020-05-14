@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tledu.zmj.dao.INoteDao">
+	<resultMap type="Note" id="noteMap" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="user" column="user_id"
+			javaType="User" resultMap="userMap"></association>
+	</resultMap>
+	<resultMap type="User" id="userMap" autoMapping="true">
+		<id property="id" column="user_id" />
+	</resultMap>
+
+	<select id="list" resultMap="noteMap">
+		SELECT * FROM t_note tn LEFT JOIN
+		t_user tu ON tn.user_id=tu.id;
+	</select>
+	
+	<select id="load" parameterType="int" resultMap="noteMap">
+		SELECT * FROM t_note tn LEFT JOIN
+		t_user tu ON tn.user_id=tu.id where tn.id=#{id};
+	</select>
+
+	<insert id="add" parameterType="Note">
+		INSERT INTO `t_note`
+		( `title`,
+		`content`, `user_id`, `creat_date`) VALUES ( #{title},
+		#{content},
+		#{user.id}, #{creat_date});
+	</insert>
+
+	<delete id="delete" parameterType="int">
+		delete from t_note where
+		id =
+		#{id}
+	</delete>
+
+	<update id="update" parameterType="Note">
+		UPDATE `t_note` SET
+		`title`=#{title}, `content`=#{content}, `user_id`=#{user.id} WHERE (`id`=#{id});
+
+	</update>
+
+
+	<update id="edit" parameterType="Note">
+		UPDATE `t_note` SET
+		`title`=#{title}, `content`=#{content} WHERE (`id`=#{id});
+	</update>
+
+
+	<select id="find" resultMap="noteMap" parameterType="map">
+		SELECT * FROM t_note tn LEFT JOIN t_user tu ON tn.user_id=tu.id where
+		tn.title like #{sreach} limit #{pageOffset},#{limit}
+	</select>
+	<select id="find_count" resultType="int" parameterType="String">
+		SELECT
+		count(*)
+		FROM t_note tn LEFT JOIN t_user tu ON tn.user_id=tu.id where
+		tn.title
+		like
+		#{sreach}
+	</select>
+
+</mapper>

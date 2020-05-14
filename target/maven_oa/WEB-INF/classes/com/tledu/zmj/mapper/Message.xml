@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tledu.zmj.dao.IMessageDao">
+
+	<resultMap type="Message" id="messageMap" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="user" column="user_id"
+			javaType="User" resultMap="userMap"></association>
+		<association property="messtype" column="messtype_id"
+			javaType="MessType" resultMap="messTypeMap"></association>
+	</resultMap>
+	<resultMap type="User" id="userMap" autoMapping="true">
+		<id property="id" column="user_id" />
+	</resultMap>
+	<resultMap type="MessType" id="messTypeMap"
+		autoMapping="true">
+		<id property="id" column="messtype_id" />
+	</resultMap>
+
+	<select id="load" parameterType="int" resultMap="messageMap">
+		select * from
+		t_message tm inner
+		join t_user tu on tm.user_id = tu.id
+		inner join
+		t_messtype tme on
+		tm.messtype_id = tme.id where tm.id = #{id}
+	</select>
+
+
+	<select id="list" resultMap="messageMap">
+		select * from t_message tm inner
+		join t_user tu on tm.user_id = tu.id
+		inner join t_messtype tme on
+		tm.messtype_id = tme.id order by tm.id desc
+	</select>
+
+	<insert id="add" parameterType="Message">
+		INSERT INTO `t_message`
+		(`title`,
+		`content`, `messtype_id`, `user_id`, `creat_date`)
+		VALUES
+		(#{title},#{content},#{messtype.id},#{user.id},#{creat_date});
+
+
+	</insert>
+
+	<delete id="delete" parameterType="int">
+		delete from t_message where
+		id
+		= #{id}
+	</delete>
+
+	<update id="update" parameterType="Message">
+		UPDATE `t_message` SET
+		`title`=#{title}, `content`=#{content},
+		`messtype_id`=#{messtype.id},
+		`user_id`=#{user.id}
+		WHERE (`id`=#{id});
+
+	</update>
+
+
+	<update id="edit" parameterType="Message">
+		UPDATE `t_message` SET
+		`title`=#{title}, `content`=#{content}
+		WHERE
+		(`id`=#{id});
+	</update>
+
+
+	<select id="find" resultMap="messageMap" parameterType="map">
+		select *
+		from t_message tm inner
+		join t_user tu on tm.user_id = tu.id
+		inner join
+		t_messtype tme on
+		tm.messtype_id = tme.id where tm.title like #{sreach}
+		order by tm.id asc
+		limit
+		#{pageOffset},#{limit};
+	</select>
+	<select id="find_count" resultType="int" parameterType="String">
+		select
+		count(*) from t_message tm inner
+		join t_user tu on tm.user_id = tu.id
+		inner join t_messtype tme on
+		tm.messtype_id = tme.id where tm.title
+		like #{sreach};
+	</select>
+
+	<select id="listMessType" resultType="MessType">
+		select * from t_messtype;
+	</select>
+
+
+
+
+	<!-- 公告的xml -->
+	<select id="find_count2" resultType="int">
+		SELECT count(*) from
+		t_message tme INNER JOIN
+		t_messtype tm on   tme.messtype_id = tm.id
+	</select>
+	<select id="find2" resultMap="messageMap2" parameterType="map">
+		SELECT
+		* from t_message tme INNER JOIN
+		t_messtype tm on tm.id = tme.messtype_id
+		limit
+		#{pageOffset},#{limit};
+	</select>
+	<resultMap type="Message" id="messageMap2" autoMapping="true">
+		<id property="id" column="id" />
+		<association property="messtype" column="messtype_id"
+			javaType="MessType" resultMap="messTypeMap2"></association>
+	</resultMap>
+	<resultMap type="MessType" id="messTypeMap2"
+		autoMapping="true">
+		<id property="id" column="messtype_id" />
+	</resultMap>
+	<select id="ann" resultMap="messageMap2" >
+		SELECT
+		* from t_message tme INNER JOIN
+		t_messtype tm on tm.id = tme.messtype_id
+	</select>
+
+</mapper>
